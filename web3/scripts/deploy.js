@@ -7,8 +7,18 @@
 const hre = require("hardhat");
 
 async function main() {
+  const [deployer] = await hre.ethers.getSigners();
+
+  // Check account balance
+  const balance = await deployer.getBalance();
+  console.log("Account balance:", hre.ethers.utils.formatEther(balance));
+
+  if (balance.lt(hre.ethers.utils.parseEther("0.01"))) {
+    throw new Error("===========================Insufficient funds for deployment=============================");
+  }
+
   const currentTimestampInSeconds = Math.round(Date.now() / 1000);
-  const ONE_YEAR_IN_SECS = 365 * 24 * 60 * 60;
+  const ONE_YEAR_IN_SECS = 20;
   const unlockTime = currentTimestampInSeconds + ONE_YEAR_IN_SECS;
 
   const lockedAmount = hre.ethers.utils.parseEther("1");
