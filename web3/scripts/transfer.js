@@ -1,10 +1,12 @@
 const { ethers } = require("hardhat");
 require("dotenv").config();
+const {receiverAddress, amt} = require("../receiver")
 
 async function main() {
-  const contractAddress = "0xb3eb92e5b874d722b992cd9b8117bfaa7df012b5";
-  const receiverAddress = "0xfB8ae9808D84BF601f2Ef6178Da51a612bD046D0";
-  const amount = ethers.utils.parseUnits("33", 18); // Adjust decimals as needed
+     const contractAddress = process.env.CONTRACT_ADDRESS
+//   const contractAddress = "0xb3eb92e5b874d722b992cd9b8117bfaa7df012b5";
+//   const receiverAddress = "0xfB8ae9808D84BF601f2Ef6178Da51a612bD046D0";
+  const amount = ethers.utils.parseUnits(`${amt}`, 18); // Adjust decimals as needed
 
   const [deployer] = await ethers.getSigners();
 
