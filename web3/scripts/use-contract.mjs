@@ -9,6 +9,8 @@ async function transfer(
   recipientAddress,
   amount
 ) {
+  console.log(`Transacted ${amount} tokens to ${recipientAddress}TTTTTTTTTTTTTTTTTT`);
+
   // Transaction
   const tranc = await myCustomToken.transfer(recipientAddress, amount);
   await tranc.wait();

@@ -14,7 +14,7 @@ async function main() {
   
   // Compile and deploy the contract
   const MyCustomToken = await hre.ethers.getContractFactory("MyCustomToken");
-  const myCustomToken = await MyCustomToken.deploy("0xB702203B9FD0ee85aeDB9d314C075D480d716635");
+  const myCustomToken = await MyCustomToken.deploy();
   await myCustomToken.deployed();
 
   console.log("MyCustomToken deployed to:", myCustomToken.address);
