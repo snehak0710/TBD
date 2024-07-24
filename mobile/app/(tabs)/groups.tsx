@@ -1,5 +1,7 @@
 import { StyleSheet, Text, View, TextInput, FlatList, TouchableOpacity } from 'react-native';
-import React, { useState } from 'react';
+import React, { useState, useCallback } from 'react';
+import { LinearGradient } from 'expo-linear-gradient';
+import { FontAwesome } from '@expo/vector-icons';
 
 interface Group {
   name: string;
@@ -7,67 +9,68 @@ interface Group {
   newPosts: number;
 }
 
+// Simulated initial data
+  const allGrps: Group[] = [{ name: "Fun Ai Founders", memberCount: "3.1K", newPosts: 8 },{ name: "Anime Club", memberCount: "7.1K", newPosts: 20 },{ name: "World News", memberCount: "13.1K", newPosts: 35 },{ name: "Tech Enthusiasts", memberCount: "9.5K", newPosts: 15 },{ name: "Book Lovers", memberCount: "5.3K", newPosts: 10 },{ name: "Travel Buddies", memberCount: "2.8K", newPosts: 5 },{ name: "Foodies United", memberCount: "6.1K", newPosts: 12 },{ name: "Movie Buffs", memberCount: "4.3K", newPosts: 7 },{ name: "Music Fans", memberCount: "8.4K", newPosts: 20 },{ name: "Fitness Enthusiasts", memberCount: "3.9K", newPosts: 15 },{ name: "Gaming Community", memberCount: "11.2K", newPosts: 30 },{ name: "DIY Crafts", memberCount: "5.7K", newPosts: 8 },{ name: "Pet Lovers", memberCount: "7.9K", newPosts: 18 },{ name: "Photography", memberCount: "10.1K", newPosts: 22 },{ name: "Startup Entrepreneurs", memberCount: "2.3K", newPosts: 10 },{ name: "Mental Health", memberCount: "4.9K", newPosts: 13 },{ name: "Gardening", memberCount: "6.8K", newPosts: 9 },{ name: "Language Learners", memberCount: "5.6K", newPosts: 6 },{ name: "Tech Innovations", memberCount: "9.7K", newPosts: 17 },{ name: "Book Recommendations", memberCount: "3.4K", newPosts: 12 },{ name: "History Enthusiasts", memberCount: "2.7K", newPosts: 8 },];
+
+
 const Groups = () => {
-  const [showAllYourGrps, setShowAllYourGrps] = useState(false);
+  const [groups, setGroups] = useState<Group[]>(allGrps.slice(0, 10));
+  const [loading, setLoading] = useState(false);
 
-  const yourGrps: Group[] = [
-    { name: "Fun Ai Founders", memberCount: "3.1K", newPosts: 8 },
-    { name: "Anime Club", memberCount: "7.1K", newPosts: 20 },
-    { name: "World News", memberCount: "13.1K", newPosts: 35 },
-    { name: "Tech Enthusiasts", memberCount: "9.5K", newPosts: 15 },
-    { name: "Book Lovers", memberCount: "5.3K", newPosts: 10 },
-  ];
-
-  const moreGrps: Group[] = [
-    { name: "Science Club", memberCount: "2.1K", newPosts: 5 },
-    { name: "Music Lovers", memberCount: "6.2K", newPosts: 12 },
-    { name: "Fitness Freaks", memberCount: "4.3K", newPosts: 9 },
-    { name: "Photography", memberCount: "8.4K", newPosts: 20 },
-  ];
+  // Function to load more items
+  const loadMoreItems = useCallback(() => {
+    if (loading) return;
+    setLoading(true);
+    setTimeout(() => {
+      setGroups((prevGroups) => {
+        const newGroups = allGrps.slice(prevGroups.length, prevGroups.length + 10);
+        return [...prevGroups, ...newGroups];
+      });
+      setLoading(false);
+    }, 1000); // Simulate network delay
+  }, [loading]);
 
   const renderGroup = ({ item }: { item: Group }) => (
     <TouchableOpacity style={styles.groupItem} onPress={() => console.log(item.name)}>
-      <Text style={styles.groupName}>{item.name}</Text>
-      <Text style={styles.groupInfo}>{`${item.memberCount} members · ${item.newPosts} new posts`}</Text>
+      <View>
+        <Text style={styles.groupName}>{item.name}</Text>
+        <Text style={styles.groupInfo}>{`${item.memberCount} members · ${item.newPosts} new posts`}</Text>
+      </View>
     </TouchableOpacity>
   );
 
-  return (
-    <View style={styles.container}>
-      <TextInput
-        style={styles.input}
-        placeholder="Search for groups"
-        placeholderTextColor="#4A255D"
-      />
-      <FlatList
-        data={yourGrps.slice(0, showAllYourGrps ? yourGrps.length : 3)}
-        keyExtractor={(item) => item.name}
-        renderItem={renderGroup}
-        ListHeaderComponent={() => (
-          <View style={styles.section}>
-            <Text style={styles.sectionTitle}>My Groups</Text>
-          </View>
-        )}
-        ListFooterComponent={() => (
-          <TouchableOpacity onPress={() => setShowAllYourGrps(!showAllYourGrps)}>
-            <Text style={styles.seeMore}>{showAllYourGrps ? "See less" : "See more"}</Text>
-          </TouchableOpacity>
-        )}
-      />
-      <FlatList
-        data={moreGrps}
-        keyExtractor={(item) => item.name}
-        renderItem={renderGroup}
-        ListHeaderComponent={() => (
-          <View style={styles.section}>
-            <Text style={styles.sectionTitle}>Discover More Groups</Text>
-            <TouchableOpacity style={styles.groupItem} onPress={() => console.log("Create New Group")}>
-              <Text style={styles.createGroupText}>+ Create New Group</Text>
-            </TouchableOpacity>
-          </View>
-        )}
-      />
+  const headerComponent = () => (
+    <View style={styles.section}>
+      <Text style={styles.sectionTitle}>My Groups</Text>
     </View>
+  );
+
+  return (
+    <LinearGradient colors={['#4A255D', '#3A1D4C', '#2A163B']} style={styles.container}>
+      <View style={styles.headerContainer}>
+        <Text style={styles.pageTitle}>Groups</Text>
+      </View>
+      <View style={styles.searchContainer}>
+        <FontAwesome name="search" size={20} color="#4A255D" style={styles.searchIcon} />
+        <TextInput
+          style={styles.input}
+          placeholder="Search for groups"
+          placeholderTextColor="#4A255D"
+        />
+      </View>
+      <View style={styles.overlay}>
+        <FlatList
+          data={groups}
+          keyExtractor={(item) => item.name}
+          renderItem={renderGroup}
+          ListHeaderComponent={headerComponent}
+          stickyHeaderIndices={[0]} // This makes the header sticky
+          onEndReached={loadMoreItems}
+          onEndReachedThreshold={0.1} // Trigger when 10% from the end
+          ListFooterComponent={() => loading ? <Text style={styles.loading}>Loading...</Text> : null}
+        />
+      </View>
+    </LinearGradient>
   );
 };
 
@@ -76,52 +79,80 @@ export default Groups;
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    padding: 20,
-    backgroundColor: "#fff",
+    padding: 5,
   },
   input: {
-    width: "100%",
+    width: "90%",
     height: 50,
-    backgroundColor: "rgba(0, 0, 0, 0.1)",
-    marginBottom: 20,
+    backgroundColor: "#DBA8F0",
     borderRadius: 5,
     color: "#4A255D",
     paddingHorizontal: 15,
     fontWeight: 'bold',
   },
-  section: {
+  searchContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
     marginBottom: 20,
   },
+  searchIcon: {
+    marginRight: 10,
+  },
+  headerContainer: {
+    marginBottom: 20,
+  },
+  pageTitle: {
+    fontSize: 30,
+    fontWeight: "bold",
+    color: "#fff",
+    marginLeft: 50,
+    alignSelf: "flex-start",
+  },
+  overlay: {
+    backgroundColor: "#000",
+    borderTopLeftRadius: 100,
+    borderTopRightRadius: 100,
+    paddingTop: 20,
+    paddingBottom: 0,
+    marginTop: 'auto',
+    flex: 1,
+  },
+  section: {
+    backgroundColor: "#000",
+    borderTopLeftRadius: 100,
+    borderTopRightRadius: 100,
+    paddingTop: 20,
+    paddingBottom: 0,
+    marginTop: 'auto',
+    flex: 1, // Ensure it has a background color to cover the gradient behind it
+  },
   sectionTitle: {
-    fontSize: 18,
+    fontSize: 30,
     fontWeight: "bold",
     marginBottom: 10,
-    color: "#4A255D",
+    color: "#fff",
+    marginLeft:50,
+    alignSelf:"flex-start"
   },
   groupItem: {
     marginBottom: 10,
+    marginLeft: 20,
     padding: 10,
-    backgroundColor: "#fff",
+    backgroundColor: "#000",
     borderRadius: 5,
-    alignItems: 'center',
   },
   groupName: {
     fontSize: 16,
     fontWeight: "bold",
+    color: "#fff",
   },
   groupInfo: {
     fontSize: 14,
-    color: "#666",
+    color: "#FFA6FA",
   },
-  seeMore: {
-    color: "#4A255D",
-    fontWeight: "bold",
+  loading: {
+    color: "#fff",
     textAlign: "center",
-    marginTop: 10,
-  },
-  createGroupText: {
-    fontSize: 16,
-    fontWeight: 'bold',
-    color: "#4A255D",
+    paddingVertical: 20,
   },
 });
