@@ -1,4 +1,4 @@
-const receiverAddress = "0xfb8ae9808d84bf601f2ef6178da51a612bd046d0";
-const amt = 1;
+const receiverAddress = "0x2134Edd2F7dFc24Dd616cedC12a14D6FF77144e3";
+const amt = 3;
 
 module.exports = { receiverAddress, amt };

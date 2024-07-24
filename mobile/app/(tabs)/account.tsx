@@ -1,17 +1,33 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, Modal, TextInput } from 'react-native';
 import { FontAwesome } from '@expo/vector-icons';
+
+const serverLink = "http://192.168.0.111:9000";
 
 export default function AccountScreen() {
   const [modalVisible, setModalVisible] = useState(false);
   const [withdrawAmount, setWithdrawAmount] = useState('');
-
+  const [response, setResponse] = useState(''); // Ensure response state is declared
   const user = {
-    walletAddress: '0x1234...abcd',
+    walletAddress: '0x2134Edd2F7dFc24Dd616cedC12a14D6FF77144e3',
     chainLogo: 'https://example.com/chain-logo.png',
     inAppPoints: 500,
     totalEarned: 1000,
   };
+
+  // Fetch data from the server when the component mounts
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const response = await fetch(`${serverLink}/`);
+        const text = await response.text();
+        setResponse(text); // Update the response state
+      } catch (error) {
+        console.error(error);
+      }
+    };
+    fetchData();
+  }, []);
 
   const handleWithdraw = () => {
     setModalVisible(true);
@@ -19,19 +35,20 @@ export default function AccountScreen() {
 
   const handleConfirmWithdraw = async () => {
     setModalVisible(false);
-    // Make the POST request
     try {
-      const response = await fetch('/wallet', {
+      // Make the POST request to /withdraw
+      const response = await fetch(`${serverLink}/withdraw`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-          claimableAmount: withdrawAmount,
-          walletAddress: user.walletAddress,
+          amt: withdrawAmount,
+          receiverAddress: user.walletAddress,
         }),
       });
-      const data = await response.json();
+      console.log("Made request");
+      const data = await response.text(); // Using text() because the response is plain text
       console.log(data);
     } catch (error) {
       console.error(error);
@@ -60,6 +77,7 @@ export default function AccountScreen() {
       <TouchableOpacity style={styles.button} onPress={handleWithdraw}>
         <Text style={styles.buttonText}>Withdraw Points</Text>
       </TouchableOpacity>
+      <Text style={{color:"#000"}}>{response}</Text> {/* Display the response from the server */}
 
       <Modal visible={modalVisible} transparent={true} animationType="slide">
         <View style={styles.modalContainer}>
